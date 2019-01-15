@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="//d3js.org/topojson.v1.min.js"></script>
+  <style>
+    * {
+      padding: 0;
+      margin: 0
+    }
+    
+    input:focus,
+    textarea:focus,
+    button:focus {
+      outline: none;
+    }
+    
+    body {
+      background: #fff;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      color: white;
+      padding: 0px;
+      margin: 0px;
+      overflow: hidden;
+    }
+    
+    #map {
+      width: 100%;
+    }
+    
+    svg {
+      width: 70%;
+      height: 100%;
+      float: right;
+    }
+    
+    #info {
+      width: 20%;
+      position: absolute;
+    }
+    
+    .container {
+      display: block;
+      width: 30%;
+      background-color: rgba(14, 62, 102, 0.5);
+      height: 100vh;
+      float: left;
+      overflow: scroll;
+    }
+    
+    #info {
+      background-color: rgba(14, 62, 102, 1);
+      list-style: none;
+      width: 30%;
+      overflow: scroll;
+      margin-top: 30px;
+      float: left;
+      height: 590px;
+    }
+    
+    #info li {
+      line-height: 80px;
+      padding-left: 80px;
+      border-bottom: 1px solid #246896;
+    }
+    
+    span {
+      float: right;
+      padding-right: 80px;
+      font-size: 20px;
+      font-weight: 400
+    }
+    
+    input {
+      float: left;
+      height: 35px;
+      border: none;
+      width: 53%;
+      margin-left: 5%;
+      margin-top: 30px;
+      padding-left: 25px
+    }
+    
+    button {
+      display: block;
+      width: 30%;
+      height: 35px;
+      background-color: pink;
+      border: none;
+      margin-top: 30px;
+    }
+    
+    h2 {
+      position: absolute;
+      bottom: 0;
+      left: 33%;
+      color: rgba(14, 62, 102, 1);
+      font-size: 25px;
+      line-height: 40px;
+      text-align: left;
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <div id="map">
+      <div class="container">
+        <input type="text" id="inputfield" placeholder="Zoek een naam" />
+        <button onclick="telNamen()">Zoek</button>
+        <input type="text" id="myInput" placeholder="Filter gemeentes" title="Type in a name">
+        <button onclick="filter()">Filter</button>
+        <ul id="info" class="myUL"></ul>
+        <div class="spacer" style="clear: both;"></div>
+      </div>
+    </div>
+    <h2>Voorkomen van vrouwelijke namen per gemeente, <br/>wanneer het aantal groter is dan 5.</h2>
+  </div>
+  <script type="text/javascript">
+    var width = 960;
+    var height = 700;
+
+    map = d3.select("#map")
+      .append("svg")
+      .attr("id", "dorpen")
+      .attr("width", width)
+      .attr("height", height);
+
+    var maph = document.getElementById('dorpen').clientHeight;
+
+    var projection = d3.geo.mercator()
+      .scale([11500])
+      .translate([-400, 12150])
+
+    var path = d3.geo.path()
+      .projection(projection);
+
+    function fillStuf(info) {
+      if (info.aantal <= 10) {
+        return "rgba(14, 62, 102, 0.1)";
+      }
+      if (10 < info.aantal && info.aantal <= 50) {
+        return "rgba(14, 62, 102, 0.2)";
+      }
+      if (50 < info.aantal && info.aantal <= 100) {
+        return "rgba(14, 62, 102, 0.3)";
+      }
+      if (100 < info.aantal && info.aantal <= 200) {
+        return "rgba(14, 62, 102, 0.4)";
+      }
+      if (200 < info.aantal && info.aantal <= 400) {
+        return "rgba(14, 62, 102, 0.5)";
+      }
+      if (400 < info.aantal && info.aantal <= 600) {
+        return "rgba(14, 62, 102, 0.6)";
+      }
+      if (600 < info.aantal && info.aantal <= 800) {
+        return "rgba(14, 62, 102, 0.7)";
+      }
+      if (800 < info.aantal && info.aantal <= 1000) {
+        return "rgba(14, 62, 102, 0.8)";
+      }
+      if (1000 < info.aantal && info.aantal <= 1200) {
+        return "rgba(14, 62, 102, 0.9)";
+      }
+      if (info.aantal > 1200) {
+        return "rgba(14, 62, 102, 1)";
+      }
+    }
+
+    var array = [];
+
+    function telNamen() {
+      if (document.getElementById('inputfield').value == "") {
+        alert("Vul een naam in")
+        return null;
+      }
+      document.getElementById('dorpen').innerHTML = "";
+      document.getElementById('myInput').value = "";
+      array = [];
+      var x = document.getElementById("inputfield").value;
+      document.getElementById('info').innerHTML = "";
+      var b = {};
+      d3.csv("data.csv", function (d) {
+        for (i in d) {
+          if (d[i].naam == x) {
+            b = {
+              plaats: d[i].plaats,
+              aantal: d[i].frequency
+            }
+            array.push(b);
+
+            document.getElementById('info').innerHTML = document.getElementById('info').innerHTML + '<li>' + d[i].plaats + '<span>' + d[i].frequency + '</span>' + '</li>';
+          }
+        }
+        newFunction();
+        return {
+          Plaats: d.plaats,
+          Naam: d.naam,
+          Frequency: +d.frequency,
+        };
+      });
+    }
+
+    var url = "https://raw.githubusercontent.com/Datafable/rolling-blackout-belgium/master/data/geospatial/municipalities-belgium.geojson";
+
+    function newFunction() {
+      d3.json(url, function (err, geojson) {
+
+        var newDict = {};
+
+        var mapstates = map.append("svg:g")
+          .attr("id", "states")
+          .style("stroke", "pink")
+          .style("stroke-width", 1);
+
+        mapstates
+          .selectAll("path")
+          .data(geojson.features)
+          .enter().append("path")
+          .attr("d", path)
+
+
+        mapstates
+          .selectAll("path")
+          .attr("d", path)
+          .attr("class", function (d) {
+            return newDict[d.id];
+          })
+          .attr("fill", function (d) {
+            if (array.length != 0) {
+              if (array.filter(e => e.plaats === d.properties.name).length > 0) {
+                var string = d.properties.name;
+                if (string.includes("#")) {
+                  string = string.substr(0, string.indexOf("#") + 1);
+                  return string;
+                }
+                var x = (array.find(x => x.plaats === string));
+                return fillStuf(x);
+              } else {
+                return "none"
+              }
+            }
+          })
+
+        for (var i = 0; i < 589; i++) {
+          var d = document.getElementsByTagName("path")[i].getAttribute("d");
+          var x = d.substr(0, d.indexOf("Z") + 1);
+          document.getElementsByTagName("path")[i].setAttribute("d", x);
+        }
+      });
+    };
+
+    function filter() {
+      var input, filter, ul, li, a, i, txtValue;
+      input = document.getElementById("myInput");
+      filter = input.value.toUpperCase();
+      ul = document.getElementsByClassName("myUL")[0];
+      li = ul.getElementsByTagName("li");
+      for (i = 0; i < li.length; i++) {
+        a = li[i];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
+        }
+      }
+    }
+  </script>
+</body>
