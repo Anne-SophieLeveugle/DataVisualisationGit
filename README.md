@@ -1,2 +1,0 @@
-# DataVisualisationGit
-Datavisualistion portfolio
