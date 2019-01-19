@@ -124,6 +124,7 @@
     var width = 960;
     var height = 700;
 
+    //set svg tag in div with id "map"
     map = d3.select("#map")
       .append("svg")
       .attr("id", "dorpen")
@@ -132,13 +133,16 @@
 
     var maph = document.getElementById('dorpen').clientHeight;
 
+    //show map in svg with right scale and transition
     var projection = d3.geo.mercator()
       .scale([11500])
       .translate([-400, 12150])
 
+    //create path for map
     var path = d3.geo.path()
       .projection(projection);
 
+    //fill village with specific color if it occurs a certain times in it
     function fillStuf(info) {
       if (info.aantal <= 10) {
         return "rgba(14, 62, 102, 0.1)";
@@ -174,6 +178,7 @@
 
     var array = [];
 
+    //count how many times an name occurs in an village
     function telNamen() {
       if (document.getElementById('inputfield').value == "") {
         alert("Vul een naam in")
@@ -185,6 +190,7 @@
       var x = document.getElementById("inputfield").value;
       document.getElementById('info').innerHTML = "";
       var b = {};
+      //import csv file with information about the names
       d3.csv("data.csv", function (d) {
         for (i in d) {
           if (d[i].naam == x) {
@@ -208,11 +214,13 @@
 
     var url = "https://raw.githubusercontent.com/Datafable/rolling-blackout-belgium/master/data/geospatial/municipalities-belgium.geojson";
 
+    //import json file with paths to draw Belgium
     function newFunction() {
       d3.json(url, function (err, geojson) {
 
         var newDict = {};
 
+        //create mapstates element to be able to edit the map
         var mapstates = map.append("svg:g")
           .attr("id", "states")
           .style("stroke", "pink")
@@ -255,6 +263,7 @@
       });
     };
 
+    //being able to search through found villages
     function filter() {
       var input, filter, ul, li, a, i, txtValue;
       input = document.getElementById("myInput");

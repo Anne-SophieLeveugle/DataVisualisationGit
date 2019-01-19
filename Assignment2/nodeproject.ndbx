@@ -9,10 +9,12 @@
             <port name="halign" type="string" value="right"/>
         </node>
         <node name="colorize1" position="-14.00,7.00" prototype="corevector.colorize">
-            <port name="fill" type="color" value="#ff000064"/>
+            <port name="fill" type="color" value="#32cd7188"/>
         </node>
         <node name="colorize2" position="-6.00,7.00" prototype="corevector.colorize">
-            <port name="fill" type="color" value="#00ff0064"/>
+            <port name="fill" type="color" value="#00ff0000"/>
+            <port name="stroke" type="color" value="#2f00bdff"/>
+            <port name="strokeWidth" type="float" value="15.0"/>
         </node>
         <node name="combine1" position="2.00,9.00" prototype="list.combine"/>
         <node name="count1" position="9.00,4.00" prototype="list.count"/>
@@ -64,7 +66,7 @@
         </node>
         <node name="rotate1" position="3.00,11.00" prototype="corevector.rotate"/>
         <node name="textpath1" position="4.00,5.00" prototype="corevector.textpath">
-            <port name="font_size" type="float" value="13.0"/>
+            <port name="font_size" type="float" value="36.0"/>
             <port name="align" type="string" value="LEFT"/>
         </node>
         <node name="translate1" position="3.00,12.00" prototype="corevector.translate"/>
